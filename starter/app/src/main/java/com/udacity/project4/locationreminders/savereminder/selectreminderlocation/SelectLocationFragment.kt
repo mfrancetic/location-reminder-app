@@ -95,9 +95,9 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
         val zoomLevel = 15f
 
         map.moveCamera(CameraUpdateFactory.newLatLngZoom(userLatLng, zoomLevel))
+        map.setMapStyle(MapStyleOptions.loadRawResourceStyle(context, R.raw.map_style))
 
         //        TODO: zoom to the user location after taking his permission
-//        TODO: add style to the map
 //        TODO: put a marker to location that the user selected
     }
 }
