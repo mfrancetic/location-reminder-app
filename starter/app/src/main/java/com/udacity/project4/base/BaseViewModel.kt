@@ -11,6 +11,7 @@ import com.udacity.project4.utils.SingleLiveEvent
 abstract class BaseViewModel(app: Application) : AndroidViewModel(app) {
 
     val navigationCommand: SingleLiveEvent<NavigationCommand> = SingleLiveEvent()
+    val intentCommand: SingleLiveEvent<IntentCommand> = SingleLiveEvent()
     val showErrorMessage: SingleLiveEvent<String> = SingleLiveEvent()
     val showSnackBar: SingleLiveEvent<String> = SingleLiveEvent()
     val showSnackBarInt: SingleLiveEvent<Int> = SingleLiveEvent()
