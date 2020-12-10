@@ -5,10 +5,12 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
+import androidx.databinding.DataBindingUtil
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.IdpResponse
 import com.udacity.project4.R
 import com.udacity.project4.base.IntentCommand
+import com.udacity.project4.databinding.ActivityAuthenticationBinding
 import com.udacity.project4.locationreminders.RemindersActivity
 import org.koin.android.ext.android.inject
 import org.koin.core.logger.KOIN_TAG
@@ -20,6 +22,7 @@ import org.koin.core.logger.KOIN_TAG
 class AuthenticationActivity : AppCompatActivity() {
 
     val _viewModel: AuthenticationViewModel by inject()
+    private lateinit var binding: ActivityAuthenticationBinding
 
     companion object {
         private const val SIGN_IN_RESULT_CODE = 1
@@ -27,19 +30,27 @@ class AuthenticationActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_authentication)
+        binding = DataBindingUtil.setContentView(
+                this,
+                R.layout.activity_authentication
+        )
+
+        binding.viewModel = _viewModel
 
         setupObservers()
-
-        launchSignInFlow()
     }
 
     private fun setupObservers() {
+        _viewModel.launchSignInFlow.observe(this, { launchSignInFlow ->
+            if (launchSignInFlow) {
+                launchSignInFlow()
+                _viewModel.onLoginFlowDone()
+            }
+        })
+
         _viewModel.authenticationState.observe(this, { authenticationState ->
             if (authenticationState == AuthenticationViewModel.AuthenticationState.AUTHENTICATED) {
                 navigateToRemindersActivity()
-            } else {
-                launchSignInFlow()
             }
         })
 
