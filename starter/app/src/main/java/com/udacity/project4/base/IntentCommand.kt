@@ -1,6 +1,7 @@
 package com.udacity.project4.base
 
 import androidx.appcompat.app.AppCompatActivity
+import com.udacity.project4.authentication.AuthenticationActivity
 import com.udacity.project4.locationreminders.RemindersActivity
 
 /**
@@ -20,5 +21,5 @@ sealed class IntentCommand {
     /**
      * navigate back to a destination in the back stack
      */
-    data class BackTo(val activity: AppCompatActivity) : IntentCommand()
+    data class BackTo(val activity: Class<AuthenticationActivity>) : IntentCommand()
 }
