@@ -71,6 +71,7 @@ class AuthenticationActivity : AppCompatActivity() {
                 AuthUI.getInstance()
                         .createSignInIntentBuilder()
                         .setTheme(R.style.FirebaseTheme)
+                        .setLogo(R.mipmap.ic_launcher)
                         .setAvailableProviders(providers)
                         .build(),
                 SIGN_IN_RESULT_CODE
