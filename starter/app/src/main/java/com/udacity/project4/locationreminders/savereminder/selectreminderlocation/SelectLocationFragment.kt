@@ -6,6 +6,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.pm.PackageManager
 import android.location.Location
+import android.location.LocationManager
 import android.os.Bundle
 import android.view.*
 import androidx.core.content.ContextCompat
@@ -120,7 +121,7 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
                 )
                 _selectLocationViewModel.setMarker()
             } else {
-                _viewModel.showSnackBar.postValue(getString(R.string.only_one_location_allowed))
+                _viewModel.showErrorMessage.postValue(getString(R.string.only_one_location_allowed))
             }
         }
     }
@@ -136,7 +137,7 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
                 poiMarker.showInfoWindow()
                 _selectLocationViewModel.setMarker()
             } else {
-                _viewModel.showSnackBar.postValue(getString(R.string.only_one_location_allowed))
+                _viewModel.showErrorMessage.postValue(getString(R.string.only_one_location_allowed))
             }
         }
     }
@@ -147,15 +148,23 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
                 Manifest.permission.ACCESS_FINE_LOCATION
             ) == PackageManager.PERMISSION_GRANTED
         ) {
-            map.isMyLocationEnabled = true
-            zoomToUserLocation()
-            setMapClickListener()
-            setPoiClick()
+            if (isLocationEnabled()) {
+                map.isMyLocationEnabled = true
+                zoomToUserLocation()
+                setMapClickListener()
+                setPoiClick()
+            } else {
+                promptUserToEnableLocationServices()
+            }
         } else {
             requestPermissions(
                 arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), REQUEST_LOCATION_PERMISSION
             )
         }
+    }
+
+    private fun promptUserToEnableLocationServices() {
+        _viewModel.showErrorMessage.postValue(getString(R.string.location_required_error))
     }
 
     @SuppressLint("MissingPermission")
@@ -176,7 +185,23 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
         if (requestCode == REQUEST_LOCATION_PERMISSION) {
             if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 enableMyLocation()
+            } else {
+                if (isLocationEnabled()) {
+                    promptUserToGrantLocationPermission()
+                } else {
+                    promptUserToEnableLocationServices()
+                }
             }
         }
+    }
+
+    private fun promptUserToGrantLocationPermission() {
+        _viewModel.showErrorMessage.postValue(getString(R.string.permission_denied_explanation))
+    }
+
+    private fun isLocationEnabled(): Boolean {
+        val locationManager =
+            fragmentContext.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
     }
 }
