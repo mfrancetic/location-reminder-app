@@ -2,28 +2,24 @@ package com.udacity.project4.locationreminders.savereminder.selectreminderlocati
 
 
 import android.Manifest
-import android.app.Activity
-import android.content.Intent
-import android.content.IntentSender
+import android.annotation.SuppressLint
+import android.content.Context
 import android.content.pm.PackageManager
-import android.content.res.Resources
+import android.location.Location
 import android.os.Bundle
-import android.util.Log
 import android.view.*
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
-import com.google.android.gms.common.api.ApiException
-import com.google.android.gms.common.api.ResolvableApiException
-import com.google.android.gms.location.*
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
-import com.google.android.gms.maps.model.*
-import com.google.android.material.snackbar.Snackbar
+import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.MapStyleOptions
 import com.udacity.project4.R
 import com.udacity.project4.base.BaseFragment
-import com.udacity.project4.base.NavigationCommand
 import com.udacity.project4.databinding.FragmentSelectLocationBinding
 import com.udacity.project4.locationreminders.savereminder.SaveReminderViewModel
 import com.udacity.project4.utils.setDisplayHomeAsUpEnabled
@@ -31,14 +27,21 @@ import org.koin.android.ext.android.inject
 
 class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
 
+    companion object {
+        private const val REQUEST_LOCATION_PERMISSION = 1
+    }
+
     //Use Koin to get the view model of the SaveReminder
     override val _viewModel: SaveReminderViewModel by inject()
     private lateinit var binding: FragmentSelectLocationBinding
     private lateinit var map: GoogleMap
+    private lateinit var fragmentContext: Context
+
+    private lateinit var fusedLocationClient: FusedLocationProviderClient
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         binding =
             DataBindingUtil.inflate(inflater, R.layout.fragment_select_location, container, false)
 
@@ -47,6 +50,10 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
 
         setHasOptionsMenu(true)
         setDisplayHomeAsUpEnabled(true)
+
+        fragmentContext = binding.saveLocationButton.context
+
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(fragmentContext)
 
         val mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
@@ -91,13 +98,47 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
     override fun onMapReady(googleMap: GoogleMap) {
         map = googleMap
 
-        val userLatLng = LatLng(51.52659924063773, -0.13869850940254633)
-        val zoomLevel = 15f
-
-        map.moveCamera(CameraUpdateFactory.newLatLngZoom(userLatLng, zoomLevel))
         map.setMapStyle(MapStyleOptions.loadRawResourceStyle(context, R.raw.map_style))
 
-        //        TODO: zoom to the user location after taking his permission
+
+        enableMyLocation()
 //        TODO: put a marker to location that the user selected
+    }
+
+    private fun enableMyLocation() {
+        if (ContextCompat.checkSelfPermission(
+                fragmentContext,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED
+        ) {
+            map.isMyLocationEnabled = true
+            zoomToUserLocation()
+        } else {
+            requestPermissions(
+                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), REQUEST_LOCATION_PERMISSION
+            )
+        }
+    }
+
+    @SuppressLint("MissingPermission")
+    private fun zoomToUserLocation() {
+        fusedLocationClient.lastLocation.addOnSuccessListener { location: Location ->
+            val userLatLng = LatLng(location.latitude, location.longitude)
+            val zoomLevel = 15f
+            map.moveCamera(CameraUpdateFactory.newLatLngZoom(userLatLng, zoomLevel))
+        }
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == REQUEST_LOCATION_PERMISSION) {
+            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                enableMyLocation()
+            }
+        }
     }
 }
