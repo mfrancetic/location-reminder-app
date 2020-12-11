@@ -7,7 +7,7 @@
 
         <variable
             name="viewModel"
-            type="com.udacity.project4.locationreminders.savereminder.SaveReminderViewModel" />
+            type="com.udacity.project4.locationreminders.savereminder.selectreminderlocation.SelectLocationViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -29,6 +29,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@color/colorAccent"
+            android:enabled="@{viewModel.selectedLocation != null}"
+            android:onClick="@{()-> viewModel.onSaveLocationClicked()}"
             android:text="@string/save"
             android:textColor="@color/white"
             app:layout_constraintBottom_toBottomOf="parent" />
