@@ -18,6 +18,7 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MapStyleOptions
+import com.google.android.gms.maps.model.MarkerOptions
 import com.udacity.project4.R
 import com.udacity.project4.base.BaseFragment
 import com.udacity.project4.databinding.FragmentSelectLocationBinding
@@ -33,6 +34,7 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
 
     //Use Koin to get the view model of the SaveReminder
     override val _viewModel: SaveReminderViewModel by inject()
+    val _selectLocationViewModel: SelectLocationViewModel by inject()
     private lateinit var binding: FragmentSelectLocationBinding
     private lateinit var map: GoogleMap
     private lateinit var fragmentContext: Context
@@ -51,6 +53,8 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
         setHasOptionsMenu(true)
         setDisplayHomeAsUpEnabled(true)
 
+        setupObserver()
+
         fragmentContext = binding.saveLocationButton.context
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(fragmentContext)
@@ -62,6 +66,9 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
         onLocationSelected()
 
         return binding.root
+    }
+
+    private fun setupObserver() {
     }
 
     private fun onLocationSelected() {
@@ -100,9 +107,38 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
 
         map.setMapStyle(MapStyleOptions.loadRawResourceStyle(context, R.raw.map_style))
 
-
         enableMyLocation()
-//        TODO: put a marker to location that the user selected
+    }
+
+    private fun setMapClickListener() {
+        map.setOnMapClickListener { location ->
+            if (_selectLocationViewModel.isMarkerSet.value == false) {
+                map.addMarker(
+                    MarkerOptions()
+                        .position(LatLng(location.latitude, location.longitude))
+                        .title(getString(R.string.reminder_location))
+                )
+                _selectLocationViewModel.setMarker()
+            } else {
+                _viewModel.showSnackBar.postValue(getString(R.string.only_one_location_allowed))
+            }
+        }
+    }
+
+    private fun setPoiClick() {
+        map.setOnPoiClickListener { poi ->
+            if (_selectLocationViewModel.isMarkerSet.value == false) {
+                val poiMarker = map.addMarker(
+                    MarkerOptions()
+                        .position(poi.latLng)
+                        .title(poi.name)
+                )
+                poiMarker.showInfoWindow()
+                _selectLocationViewModel.setMarker()
+            } else {
+                _viewModel.showSnackBar.postValue(getString(R.string.only_one_location_allowed))
+            }
+        }
     }
 
     private fun enableMyLocation() {
@@ -113,6 +149,8 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
         ) {
             map.isMyLocationEnabled = true
             zoomToUserLocation()
+            setMapClickListener()
+            setPoiClick()
         } else {
             requestPermissions(
                 arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), REQUEST_LOCATION_PERMISSION
