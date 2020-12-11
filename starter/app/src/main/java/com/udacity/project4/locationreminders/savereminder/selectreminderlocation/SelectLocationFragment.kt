@@ -4,12 +4,9 @@ package com.udacity.project4.locationreminders.savereminder.selectreminderlocati
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
-import android.content.pm.PackageManager
 import android.location.Location
-import android.location.LocationManager
 import android.os.Bundle
 import android.view.*
-import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
@@ -25,14 +22,10 @@ import com.udacity.project4.base.BaseFragment
 import com.udacity.project4.base.NavigationCommand
 import com.udacity.project4.databinding.FragmentSelectLocationBinding
 import com.udacity.project4.locationreminders.savereminder.SaveReminderViewModel
-import com.udacity.project4.utils.setDisplayHomeAsUpEnabled
+import com.udacity.project4.utils.*
 import org.koin.android.ext.android.inject
 
 class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
-
-    companion object {
-        private const val REQUEST_LOCATION_PERMISSION = 1
-    }
 
     //Use Koin to get the view model of the SaveReminder
     override val _viewModel: SaveReminderViewModel by inject()
@@ -44,10 +37,10 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
     private lateinit var fusedLocationClient: FusedLocationProviderClient
 
     override fun onCreateView(
-            inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
         binding =
-                DataBindingUtil.inflate(inflater, R.layout.fragment_select_location, container, false)
+            DataBindingUtil.inflate(inflater, R.layout.fragment_select_location, container, false)
 
         binding.viewModel = _selectLocationViewModel
         binding.lifecycleOwner = this
@@ -68,12 +61,14 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
     }
 
     private fun setupObserver() {
-        _selectLocationViewModel.onSaveLocationClicked.observe(viewLifecycleOwner, { isLocationSaved ->
-            if (isLocationSaved) {
-                onLocationSelected()
-                _selectLocationViewModel.onSaveLocationDone()
-            }
-        })
+        _selectLocationViewModel.onSaveLocationClicked.observe(
+            viewLifecycleOwner,
+            { isLocationSaved ->
+                if (isLocationSaved) {
+                    onLocationSelected()
+                    _selectLocationViewModel.onSaveLocationDone()
+                }
+            })
     }
 
     private fun onLocationSelected() {
@@ -123,11 +118,15 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
         map.setOnMapClickListener { location ->
             if (_selectLocationViewModel.selectedLocation.value == null) {
                 map.addMarker(
-                        MarkerOptions()
-                                .position(LatLng(location.latitude, location.longitude))
-                                .title(getString(R.string.reminder_location))
+                    MarkerOptions()
+                        .position(LatLng(location.latitude, location.longitude))
+                        .title(getString(R.string.reminder_location))
                 )
-                _selectLocationViewModel.setLocation(getString(R.string.reminder_location), location.latitude, location.longitude)
+                _selectLocationViewModel.setLocation(
+                    getString(R.string.reminder_location),
+                    location.latitude,
+                    location.longitude
+                )
             } else {
                 _viewModel.showErrorMessage.postValue(getString(R.string.only_one_location_allowed))
             }
@@ -138,25 +137,26 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
         map.setOnPoiClickListener { poi ->
             if (_selectLocationViewModel.selectedLocation.value == null) {
                 val poiMarker = map.addMarker(
-                        MarkerOptions()
-                                .position(poi.latLng)
-                                .title(poi.name)
+                    MarkerOptions()
+                        .position(poi.latLng)
+                        .title(poi.name)
                 )
                 poiMarker.showInfoWindow()
-                _selectLocationViewModel.setLocation(poi.name, poi.latLng.latitude, poi.latLng.longitude)
+                _selectLocationViewModel.setLocation(
+                    poi.name,
+                    poi.latLng.latitude,
+                    poi.latLng.longitude
+                )
             } else {
                 _viewModel.showErrorMessage.postValue(getString(R.string.only_one_location_allowed))
             }
         }
     }
 
+    @SuppressLint("MissingPermission")
     private fun enableMyLocation() {
-        if (ContextCompat.checkSelfPermission(
-                        fragmentContext,
-                        Manifest.permission.ACCESS_FINE_LOCATION
-                ) == PackageManager.PERMISSION_GRANTED
-        ) {
-            if (isLocationEnabled()) {
+        if (isForegroundLocationGrantedFromContext(fragmentContext)) {
+            if (areLocationServicesEnabled(fragmentContext)) {
                 map.isMyLocationEnabled = true
                 zoomToUserLocation()
                 setMapClickListener()
@@ -166,7 +166,7 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
             }
         } else {
             requestPermissions(
-                    arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), REQUEST_LOCATION_PERMISSION
+                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), REQUEST_LOCATION_PERMISSION
             )
         }
     }
@@ -187,16 +187,16 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
     }
 
     override fun onRequestPermissionsResult(
-            requestCode: Int,
-            permissions: Array<out String>,
-            grantResults: IntArray
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (requestCode == REQUEST_LOCATION_PERMISSION) {
-            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+        if (isRequestCodeEqualLocationPermissionCode(requestCode)) {
+            if (isForegroundLocationPermissionGrantedFromResult(grantResults)) {
                 enableMyLocation()
             } else {
-                if (isLocationEnabled()) {
+                if ((areLocationServicesEnabled(fragmentContext))) {
                     promptUserToGrantLocationPermission()
                 } else {
                     promptUserToEnableLocationServices()
@@ -207,12 +207,6 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
 
     private fun promptUserToGrantLocationPermission() {
         _viewModel.showErrorMessage.postValue(getString(R.string.permission_denied_explanation))
-    }
-
-    private fun isLocationEnabled(): Boolean {
-        val locationManager =
-                fragmentContext.getSystemService(Context.LOCATION_SERVICE) as LocationManager
-        return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
     }
 
     override fun onDestroy() {

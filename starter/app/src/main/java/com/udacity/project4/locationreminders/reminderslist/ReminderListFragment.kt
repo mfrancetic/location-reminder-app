@@ -1,5 +1,7 @@
 package com.udacity.project4.locationreminders.reminderslist
 
+import android.Manifest
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.*
@@ -11,9 +13,7 @@ import com.udacity.project4.base.BaseFragment
 import com.udacity.project4.base.IntentCommand
 import com.udacity.project4.base.NavigationCommand
 import com.udacity.project4.databinding.FragmentRemindersBinding
-import com.udacity.project4.utils.setDisplayHomeAsUpEnabled
-import com.udacity.project4.utils.setTitle
-import com.udacity.project4.utils.setup
+import com.udacity.project4.utils.*
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -22,17 +22,25 @@ class ReminderListFragment : BaseFragment() {
     override val _viewModel: RemindersListViewModel by viewModel()
     val _authenticationViewModel: AuthenticationViewModel by inject()
 
+    private lateinit var fragmentContext: Context
+
     private lateinit var binding: FragmentRemindersBinding
+
+    companion object {
+        private const val REQUEST_LOCATION_PERMISSION = 1
+    }
+
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+            inflater: LayoutInflater, container: ViewGroup?,
+            savedInstanceState: Bundle?
     ): View? {
         binding =
-            DataBindingUtil.inflate(
-                inflater,
-                R.layout.fragment_reminders, container, false
-            )
+                DataBindingUtil.inflate(
+                        inflater,
+                        R.layout.fragment_reminders, container, false
+                )
         binding.viewModel = _viewModel
+        fragmentContext = binding.addReminderFAB.context
 
         setHasOptionsMenu(true)
         setDisplayHomeAsUpEnabled(false)
@@ -42,7 +50,49 @@ class ReminderListFragment : BaseFragment() {
 
         binding.refreshLayout.setOnRefreshListener { _viewModel.loadReminders() }
 
+        enableMyLocation()
+
         return binding.root
+    }
+
+    private fun enableMyLocation() {
+        if (isForegroundLocationGrantedFromContext(fragmentContext)
+        ) {
+            if (!areLocationServicesEnabled(fragmentContext)) {
+                promptUserToEnableLocationServices()
+            }
+        } else {
+            requestPermissions(
+                    arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), REQUEST_LOCATION_PERMISSION
+            )
+        }
+    }
+
+    override fun onRequestPermissionsResult(
+            requestCode: Int,
+            permissions: Array<out String>,
+            grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (isRequestCodeEqualLocationPermissionCode(requestCode)) {
+            if (isForegroundLocationPermissionGrantedFromResult(grantResults)) {
+                enableMyLocation()
+            } else {
+                if (areLocationServicesEnabled(fragmentContext)) {
+                    promptUserToGrantLocationPermission()
+                } else {
+                    promptUserToEnableLocationServices()
+                }
+            }
+        }
+    }
+
+    private fun promptUserToGrantLocationPermission() {
+        _viewModel.showErrorMessage.postValue(getString(R.string.permission_denied_explanation))
+    }
+
+    private fun promptUserToEnableLocationServices() {
+        _viewModel.showErrorMessage.postValue(getString(R.string.location_required_error))
     }
 
     private fun setupObserver() {
@@ -73,9 +123,9 @@ class ReminderListFragment : BaseFragment() {
     private fun navigateToAddReminder() {
         //use the navigationCommand live data to navigate between the fragments
         _viewModel.navigationCommand.postValue(
-            NavigationCommand.To(
-                ReminderListFragmentDirections.toSaveReminder()
-            )
+                NavigationCommand.To(
+                        ReminderListFragmentDirections.toSaveReminder()
+                )
         )
     }
 
@@ -100,7 +150,7 @@ class ReminderListFragment : BaseFragment() {
 
     private fun navigateToAuthenticationActivity() {
         _viewModel.intentCommand.postValue(
-            IntentCommand.BackTo(AuthenticationActivity::class.java)
+                IntentCommand.BackTo(AuthenticationActivity::class.java)
         )
     }
 
