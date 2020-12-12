@@ -8,12 +8,17 @@ import androidx.lifecycle.map
 import com.firebase.ui.auth.AuthUI
 import com.udacity.project4.base.BaseViewModel
 
+
 class AuthenticationViewModel(val app: Application) :
-    BaseViewModel(app) {
+        BaseViewModel(app) {
 
     private val _launchSignInFlow = MutableLiveData<Boolean>()
     val launchSignInFlow: LiveData<Boolean>
         get() = _launchSignInFlow
+
+    private val _navigateBackToAuthenticationActivity = MutableLiveData<Boolean>()
+    val navigateBackToAuthenticationActivity: LiveData<Boolean>
+        get() = _navigateBackToAuthenticationActivity
 
     enum class AuthenticationState {
         AUTHENTICATED, UNAUTHENTICATED
@@ -21,6 +26,7 @@ class AuthenticationViewModel(val app: Application) :
 
     init {
         _launchSignInFlow.value = false
+        _navigateBackToAuthenticationActivity.value = false
     }
 
     val authenticationState = FirebaseUserLiveData().map { user ->
@@ -32,14 +38,30 @@ class AuthenticationViewModel(val app: Application) :
     }
 
     fun logout(context: Context) {
-        AuthUI.getInstance().signOut(context)
+        AuthUI.getInstance()
+                .signOut(context)
+                .addOnCompleteListener {
+                    deleteUserAccount(context)
+                }
+    }
+
+    private fun deleteUserAccount(context: Context) {
+        AuthUI.getInstance()
+                .delete(context)
+                .addOnCompleteListener {
+                    _navigateBackToAuthenticationActivity.value = true
+                }
     }
 
     fun onLoginClicked() {
         _launchSignInFlow.value = true
     }
 
-    fun onLoginFlowDone(){
+    fun onLoginFlowDone() {
         _launchSignInFlow.value = false
+    }
+
+    fun navigateBackToAuthenticationActivityDone() {
+        _navigateBackToAuthenticationActivity.value = false
     }
 }

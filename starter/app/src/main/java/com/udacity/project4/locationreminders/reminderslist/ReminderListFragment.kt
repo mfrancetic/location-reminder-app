@@ -103,6 +103,13 @@ class ReminderListFragment : BaseFragment() {
                 startActivity(intent)
             }
         })
+
+        _authenticationViewModel.navigateBackToAuthenticationActivity.observe(viewLifecycleOwner, { navigateToAuthenticationActivity ->
+            if (navigateToAuthenticationActivity) {
+                navigateToAuthenticationActivity()
+                _authenticationViewModel.navigateBackToAuthenticationActivityDone()
+            }
+        })
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -141,7 +148,6 @@ class ReminderListFragment : BaseFragment() {
         when (item.itemId) {
             R.id.logout -> {
                 logout()
-                navigateToAuthenticationActivity()
             }
         }
         return super.onOptionsItemSelected(item)
@@ -157,7 +163,6 @@ class ReminderListFragment : BaseFragment() {
     private fun logout() {
         _authenticationViewModel.logout(requireContext())
     }
-
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         super.onCreateOptionsMenu(menu, inflater)
