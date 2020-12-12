@@ -93,4 +93,11 @@ class RemindersDaoTest {
         assertThat(reminders, notNullValue())
         assertThat(reminders.size, `is`(0))
     }
+
+    @Test
+    fun getRemindersWhenNoDataFound() = runBlockingTest {
+        val savedReminders = database.reminderDao().getReminders()
+        assertThat(savedReminders, notNullValue())
+        assertThat(savedReminders.size, `is`(0))
+    }
 }
