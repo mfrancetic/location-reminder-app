@@ -146,7 +146,7 @@ class SaveReminderFragment : BaseFragment() {
         }
         locationSettingsResponseTask.addOnCompleteListener {
             if (it.isSuccessful) {
-                println(getString(R.string.location_enabled))
+                println(fragmentContext.getString(R.string.location_enabled))
             }
         }
     }
@@ -214,10 +214,10 @@ class SaveReminderFragment : BaseFragment() {
         if (areforegroundAndBackgroundLocationPermissionApproved(fragmentContext)) {
             geofencingClient.addGeofences(geofencingRequest, geofencePendingIntent).run {
                 addOnSuccessListener {
-                    Log.i(KOIN_TAG, getString(R.string.geofence_added))
+                    Log.i(KOIN_TAG, fragmentContext.getString(R.string.geofence_added))
                 }
                 addOnFailureListener {
-                    Log.i(KOIN_TAG, getString(R.string.error_adding_geofence))
+                    Log.i(KOIN_TAG, fragmentContext.getString(R.string.geofence_added))
                 }
             }
         }

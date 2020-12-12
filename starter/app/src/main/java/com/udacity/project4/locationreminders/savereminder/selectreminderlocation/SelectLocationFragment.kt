@@ -120,15 +120,15 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
                 map.addMarker(
                     MarkerOptions()
                         .position(LatLng(location.latitude, location.longitude))
-                        .title(getString(R.string.reminder_location))
+                        .title(fragmentContext.getString(R.string.reminder_location))
                 )
                 _selectLocationViewModel.setLocation(
-                    getString(R.string.reminder_location),
+                    fragmentContext.getString(R.string.reminder_location),
                     location.latitude,
                     location.longitude
                 )
             } else {
-                _viewModel.showErrorMessage.postValue(getString(R.string.only_one_location_allowed))
+                _viewModel.showErrorMessage.postValue(fragmentContext.getString(R.string.only_one_location_allowed))
             }
         }
     }
@@ -148,7 +148,7 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
                     poi.latLng.longitude
                 )
             } else {
-                _viewModel.showErrorMessage.postValue(getString(R.string.only_one_location_allowed))
+                _viewModel.showErrorMessage.postValue(fragmentContext.getString(R.string.only_one_location_allowed))
             }
         }
     }
@@ -172,7 +172,7 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
     }
 
     private fun promptUserToEnableLocationServices() {
-        _viewModel.showErrorMessage.postValue(getString(R.string.location_required_error))
+        _viewModel.showErrorMessage.postValue(fragmentContext.getString(R.string.location_required_error))
     }
 
     @SuppressLint("MissingPermission")
@@ -206,7 +206,7 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
     }
 
     private fun promptUserToGrantLocationPermission() {
-        _viewModel.showErrorMessage.postValue(getString(R.string.permission_denied_explanation))
+        _viewModel.showErrorMessage.postValue(fragmentContext.getString(R.string.permission_denied_explanation))
     }
 
     override fun onDestroy() {

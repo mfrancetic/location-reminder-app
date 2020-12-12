@@ -44,7 +44,7 @@ class ReminderListFragment : BaseFragment() {
 
         setHasOptionsMenu(true)
         setDisplayHomeAsUpEnabled(false)
-        setTitle(getString(R.string.app_name))
+        setTitle(fragmentContext.getString(R.string.app_name))
 
         setupObserver()
 
@@ -88,11 +88,11 @@ class ReminderListFragment : BaseFragment() {
     }
 
     private fun promptUserToGrantLocationPermission() {
-        _viewModel.showErrorMessage.postValue(getString(R.string.permission_denied_explanation))
+        _viewModel.showErrorMessage.postValue(fragmentContext.getString(R.string.permission_denied_explanation))
     }
 
     private fun promptUserToEnableLocationServices() {
-        _viewModel.showErrorMessage.postValue(getString(R.string.location_required_error))
+        _viewModel.showErrorMessage.postValue(fragmentContext.getString(R.string.location_required_error))
     }
 
     private fun setupObserver() {
