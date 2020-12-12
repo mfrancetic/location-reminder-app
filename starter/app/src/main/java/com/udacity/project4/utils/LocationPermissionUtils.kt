@@ -5,15 +5,12 @@ import android.annotation.TargetApi
 import android.content.Context
 import android.content.pm.PackageManager
 import android.location.LocationManager
-import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.LocationSettingsRequest
 import com.google.android.gms.location.LocationSettingsResponse
 import com.google.android.gms.tasks.Task
-import com.udacity.project4.locationreminders.savereminder.SaveReminderFragment
 
 val runningQOrLater =
     android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q
@@ -89,6 +86,10 @@ fun isForegroundLocationPermissionGrantedFromResult(grantResults: IntArray): Boo
 
 fun isRequestCodeEqualLocationPermissionCode(requestCode: Int): Boolean {
     return requestCode == REQUEST_LOCATION_PERMISSION
+}
+
+fun isRequestCodeEqualTurnDeviceLocationOnCode(requestCode: Int): Boolean {
+    return requestCode == REQUEST_TURN_DEVICE_LOCATION_ON
 }
 
 fun isForegroundLocationGrantedFromContext(fragmentContext: Context): Boolean{
