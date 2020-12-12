@@ -43,4 +43,9 @@
     <string name="only_one_location_allowed">Only one location allowed</string>
     <string name="geofence_added">Geofence added</string>
     <string name="location_enabled">Location enabled</string>
+    <string name="logo_content_description">Logo image</string>
+    <string name="description">"Description: "</string>
+    <string name="location">"Location: "</string>
+    <string name="latitude">"Latitude: "</string>
+    <string name="longitude">Longitude "</string>
 </resources>

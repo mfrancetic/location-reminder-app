@@ -1,9 +1,11 @@
 package com.udacity.project4.utils
 
 import android.view.View
+import android.widget.TextView
 import androidx.databinding.BindingAdapter
 import androidx.lifecycle.LiveData
 import androidx.recyclerview.widget.RecyclerView
+import com.udacity.project4.R
 import com.udacity.project4.base.BaseRecyclerViewAdapter
 
 
@@ -43,5 +45,33 @@ object BindingAdapters {
                     view.fadeOut()
             }
         }
+    }
+
+    @BindingAdapter("app:description")
+    @JvmStatic
+    fun setDescription(view: TextView, description: String) {
+        val descriptionText = view.context.getString(R.string.description) + description
+        view.text = descriptionText
+    }
+
+    @BindingAdapter("app:location")
+    @JvmStatic
+    fun setLocation(view: TextView, location: String) {
+        val locationText = view.context.getString(R.string.location) + location
+        view.text = locationText
+    }
+
+    @BindingAdapter("app:latitude")
+    @JvmStatic
+    fun setLatitude(view: TextView, latitude: Double) {
+        val latitudeText = view.context.getString(R.string.latitude) + latitude
+        view.text = latitudeText
+    }
+
+    @BindingAdapter("app:longitude")
+    @JvmStatic
+    fun setLongitude(view: TextView, longitude: Double) {
+        val longitudeText = view.context.getString(R.string.longitude) + longitude
+        view.text = longitudeText
     }
 }
