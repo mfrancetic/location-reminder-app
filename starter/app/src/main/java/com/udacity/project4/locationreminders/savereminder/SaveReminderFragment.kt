@@ -202,7 +202,7 @@ class SaveReminderFragment : BaseFragment() {
                 .setCircularRegion(
                         reminderDTO.latitude!!, reminderDTO.longitude!!, GEOFENCE_RADIUS_IN_METERS
                 )
-                .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_EXIT)
+                .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER)
                 .setExpirationDuration(Geofence.NEVER_EXPIRE)
                 .build()
 
