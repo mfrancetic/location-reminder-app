@@ -49,8 +49,15 @@ class AuthenticationActivity : AppCompatActivity() {
         })
 
         _viewModel.authenticationState.observe(this, { authenticationState ->
-            if (authenticationState == AuthenticationViewModel.AuthenticationState.AUTHENTICATED) {
+            if (authenticationState == AuthenticationViewModel.AuthenticationState.AUTHENTICATED &&
+                    _viewModel.navigateBackToAuthenticationActivity.value == false) {
                 navigateToRemindersActivity()
+            }
+        })
+
+        _viewModel.navigateBackToAuthenticationActivity.observe(this, { navigateToAuthenticationActivity ->
+            if (navigateToAuthenticationActivity) {
+                _viewModel.navigateBackToAuthenticationActivityDone()
             }
         })
 

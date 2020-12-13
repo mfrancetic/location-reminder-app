@@ -107,7 +107,6 @@ class ReminderListFragment : BaseFragment() {
         _authenticationViewModel.navigateBackToAuthenticationActivity.observe(viewLifecycleOwner, { navigateToAuthenticationActivity ->
             if (navigateToAuthenticationActivity) {
                 navigateToAuthenticationActivity()
-                _authenticationViewModel.navigateBackToAuthenticationActivityDone()
             }
         })
     }
