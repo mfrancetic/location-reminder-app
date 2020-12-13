@@ -5,7 +5,7 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.espresso.matcher.ViewMatchers.assertThat
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
-import com.udacity.project4.locationreminders.MainCoroutineRule
+import com.udacity.project4.MainAndroidTestCoroutineRule
 import com.udacity.project4.locationreminders.data.dto.ReminderDTO
 import com.udacity.project4.locationreminders.data.dto.Result
 import kotlinx.coroutines.Dispatchers
@@ -29,7 +29,7 @@ class RemindersLocalRepositoryTest {
     private lateinit var database: RemindersDatabase
 
     @get: Rule
-    val mainCoroutineRule = MainCoroutineRule()
+    val mainCoroutineRule = MainAndroidTestCoroutineRule()
 
     @Before
     fun initDatabaseAndRepository() {

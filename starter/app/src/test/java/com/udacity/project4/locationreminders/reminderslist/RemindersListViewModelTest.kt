@@ -5,7 +5,7 @@ import android.os.Build
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.udacity.project4.locationreminders.MainAndroidTestCoroutineRule
+import com.udacity.project4.locationreminders.MainTestCoroutineRule
 import com.udacity.project4.locationreminders.data.FakeDataSource
 import com.udacity.project4.locationreminders.data.dto.ReminderDTO
 import com.udacity.project4.locationreminders.getOrAwaitValue
@@ -28,7 +28,7 @@ import org.robolectric.annotation.Config
 class RemindersListViewModelTest {
 
     @get: Rule
-    var mainCoroutineRule = MainAndroidTestCoroutineRule()
+    var mainCoroutineRule = MainTestCoroutineRule()
 
     private lateinit var dataSource: FakeDataSource
     private lateinit var remindersListViewModel: RemindersListViewModel

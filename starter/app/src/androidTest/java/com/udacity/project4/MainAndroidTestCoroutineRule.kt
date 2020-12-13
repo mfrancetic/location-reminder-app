@@ -1,4 +1,4 @@
-package com.udacity.project4.locationreminders
+package com.udacity.project4
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -10,7 +10,7 @@ import org.junit.rules.TestWatcher
 import org.junit.runner.Description
 
 @ExperimentalCoroutinesApi
-class MainCoroutineRule(val dispatcher: TestCoroutineDispatcher = TestCoroutineDispatcher()) : TestWatcher(),
+class MainAndroidTestCoroutineRule(val dispatcher: TestCoroutineDispatcher = TestCoroutineDispatcher()) : TestWatcher(),
         TestCoroutineScope by TestCoroutineScope(dispatcher) {
     override fun starting(description: Description?) {
         super.starting(description)
