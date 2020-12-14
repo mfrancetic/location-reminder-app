@@ -72,12 +72,14 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
     }
 
     private fun onLocationSelected() {
-        _viewModel.navigationCommand.postValue(NavigationCommand.Back)
-        val reminderDTO = _selectLocationViewModel.selectedLocation.value
-        if (reminderDTO != null) {
-            _viewModel.latitude.value = reminderDTO.latitude
-            _viewModel.longitude.value = reminderDTO.longitude
-            _viewModel.reminderSelectedLocationStr.value = reminderDTO.location
+        EspressoIdlingResource.wrapEspressoIdlingResource {
+            _viewModel.navigationCommand.postValue(NavigationCommand.Back)
+            val reminderDTO = _selectLocationViewModel.selectedLocation.value
+            if (reminderDTO != null) {
+                _viewModel.latitude.value = reminderDTO.latitude
+                _viewModel.longitude.value = reminderDTO.longitude
+                _viewModel.reminderSelectedLocationStr.value = reminderDTO.location
+            }
         }
     }
 
