@@ -1,15 +1,14 @@
 package com.udacity.project4
 
 import android.app.Application
+import android.content.Context
 import androidx.test.core.app.ActivityScenario
+import androidx.test.core.app.ApplicationProvider
 import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.IdlingRegistry
-import androidx.test.espresso.action.ViewActions.click
-import androidx.test.espresso.action.ViewActions.replaceText
+import androidx.test.espresso.action.ViewActions.*
 import androidx.test.espresso.assertion.ViewAssertions.matches
-import androidx.test.espresso.matcher.RootMatchers.withDecorView
-import androidx.test.espresso.matcher.ViewMatchers
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
@@ -25,9 +24,9 @@ import com.udacity.project4.locationreminders.savereminder.selectreminderlocatio
 import com.udacity.project4.util.DataBindingIdlingResource
 import com.udacity.project4.util.monitorActivity
 import com.udacity.project4.utils.EspressoIdlingResource
+import it.xabaras.android.espresso.recyclerviewchildactions.RecyclerViewChildActions
 import kotlinx.coroutines.runBlocking
-import org.hamcrest.CoreMatchers.`is`
-import org.hamcrest.CoreMatchers.not
+import org.hamcrest.CoreMatchers.*
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -161,15 +160,51 @@ class RemindersActivityTest :
 
         onView(withId(R.id.save_location_button)).perform(click())
 
-        onView(withId(R.id.saveReminder)).perform(click())
+        val context = getApplicationContext() as Context
+
+        onView(withText(context.getString(R.string.save))).perform(click())
 
         onView(withText("title2"))
             .check(matches(isDisplayed()))
         onView(withText("description2"))
             .check(matches(isDisplayed()))
 
-        val toastMessage = appContext.getString(R.string.reminder_saved)
-        onView(withText(toastMessage)).check(matches(withEffectiveVisibility(Visibility.VISIBLE)));
+        activityScenario.close()
+    }
+
+    @Test
+    fun testClickingOnListItem_opensRemindersDescriptionActivity(): Unit = runBlocking {
+        val reminder1 = ReminderDTO(
+            "title1", "description1", "location1",
+            11.111, 11.112
+        )
+        repository.saveReminder(reminder1)
+
+        val activityScenario = ActivityScenario.launch(RemindersActivity::class.java)
+        dataBindingIdlingResource.monitorActivity(activityScenario)
+
+        onView(
+            withId(R.id.reminderssRecyclerView)
+        )
+            .check(matches(hasDescendant(withText("title1"))))
+            .perform(click())
+
+        onView(withId(R.id.reminderssRecyclerView)).perform(
+            RecyclerViewChildActions.Companion.actionOnChild(
+                click(), R.id.reminderCardView
+            )
+        )
+
+        onView(withId(R.id.reminder_title))
+            .check(matches(isDisplayed()))
+        onView(withId(R.id.reminder_description))
+            .check(matches(isDisplayed()))
+        onView(withId(R.id.reminder_location))
+            .check(matches(isDisplayed()))
+        onView(withId(R.id.reminder_latitude))
+            .check(matches(isDisplayed()))
+        onView(withId(R.id.reminder_longitude))
+            .check(matches(isDisplayed()))
 
         activityScenario.close()
     }
