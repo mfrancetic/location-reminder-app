@@ -62,7 +62,7 @@ class AuthenticationActivity : AppCompatActivity() {
         })
 
         _viewModel.intentCommand.observe(this, { command ->
-            if (command is IntentCommand.To) {
+            if (command is IntentCommand.ToReminderActivity) {
                 val intent = Intent(command.from, command.to)
                 startActivity(intent)
             }
@@ -101,7 +101,7 @@ class AuthenticationActivity : AppCompatActivity() {
 
     private fun navigateToRemindersActivity() {
         _viewModel.intentCommand.postValue(
-                IntentCommand.To(this, RemindersActivity::class.java)
+                IntentCommand.ToReminderActivity(this, RemindersActivity::class.java)
         )
     }
 }

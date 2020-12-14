@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.*
+import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import com.udacity.project4.R
 import com.udacity.project4.authentication.AuthenticationActivity
@@ -13,6 +14,7 @@ import com.udacity.project4.base.BaseFragment
 import com.udacity.project4.base.IntentCommand
 import com.udacity.project4.base.NavigationCommand
 import com.udacity.project4.databinding.FragmentRemindersBinding
+import com.udacity.project4.locationreminders.ReminderDescriptionActivity
 import com.udacity.project4.utils.*
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -31,14 +33,14 @@ class ReminderListFragment : BaseFragment() {
     }
 
     override fun onCreateView(
-            inflater: LayoutInflater, container: ViewGroup?,
-            savedInstanceState: Bundle?
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
     ): View? {
         binding =
-                DataBindingUtil.inflate(
-                        inflater,
-                        R.layout.fragment_reminders, container, false
-                )
+            DataBindingUtil.inflate(
+                inflater,
+                R.layout.fragment_reminders, container, false
+            )
         binding.viewModel = _viewModel
         fragmentContext = binding.addReminderFAB.context
 
@@ -63,15 +65,15 @@ class ReminderListFragment : BaseFragment() {
             }
         } else {
             requestPermissions(
-                    arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), REQUEST_LOCATION_PERMISSION
+                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), REQUEST_LOCATION_PERMISSION
             )
         }
     }
 
     override fun onRequestPermissionsResult(
-            requestCode: Int,
-            permissions: Array<out String>,
-            grantResults: IntArray
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (isRequestCodeEqualLocationPermissionCode(requestCode)) {
@@ -96,19 +98,33 @@ class ReminderListFragment : BaseFragment() {
     }
 
     private fun setupObserver() {
+        _authenticationViewModel.navigateBackToAuthenticationActivity.observe(
+            viewLifecycleOwner,
+            { navigateToAuthenticationActivity ->
+                if (navigateToAuthenticationActivity) {
+                    createIntentForNavigatingToAuthenticationActivity()
+                }
+            })
+
         _viewModel.intentCommand.observe(viewLifecycleOwner, { command ->
             if (command is IntentCommand.BackTo) {
-                val intent = Intent(context, command.activity)
-                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                startActivity(intent)
-            }
+                navigateToAuthenticationActivity(command)
+            } else
+                if (command is IntentCommand.ToReminderDescriptionActivity) {
+                    navigateToReminderDescriptionActivity(command)
+                }
         })
+    }
 
-        _authenticationViewModel.navigateBackToAuthenticationActivity.observe(viewLifecycleOwner, { navigateToAuthenticationActivity ->
-            if (navigateToAuthenticationActivity) {
-                navigateToAuthenticationActivity()
-            }
-        })
+    private fun navigateToReminderDescriptionActivity(command: IntentCommand.ToReminderDescriptionActivity) {
+        val intent = ReminderDescriptionActivity.newIntent(command.from, command.item)
+        startActivity(intent)
+    }
+
+    private fun navigateToAuthenticationActivity(command: IntentCommand.BackTo) {
+        val intent = Intent(context, command.activity)
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        startActivity(intent)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -129,18 +145,28 @@ class ReminderListFragment : BaseFragment() {
     private fun navigateToAddReminder() {
         //use the navigationCommand live data to navigate between the fragments
         _viewModel.navigationCommand.postValue(
-                NavigationCommand.To(
-                        ReminderListFragmentDirections.toSaveReminder()
-                )
+            NavigationCommand.To(
+                ReminderListFragmentDirections.toSaveReminder()
+            )
         )
     }
 
     private fun setupRecyclerView() {
-        val adapter = RemindersListAdapter {
+        val adapter = RemindersListAdapter { item ->
+            createIntentForNavigatingToReminderDescriptionActivity(item)
         }
-
 //        setup the recycler view using the extension function
         binding.reminderssRecyclerView.setup(adapter)
+    }
+
+    private fun createIntentForNavigatingToReminderDescriptionActivity(item: ReminderDataItem) {
+        _viewModel.intentCommand.postValue(
+            IntentCommand.ToReminderDescriptionActivity(
+                this.activity as AppCompatActivity,
+                ReminderDescriptionActivity::class.java,
+                item
+            )
+        )
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -153,9 +179,9 @@ class ReminderListFragment : BaseFragment() {
 
     }
 
-    private fun navigateToAuthenticationActivity() {
+    private fun createIntentForNavigatingToAuthenticationActivity() {
         _viewModel.intentCommand.postValue(
-                IntentCommand.BackTo(AuthenticationActivity::class.java)
+            IntentCommand.BackTo(AuthenticationActivity::class.java)
         )
     }
 
