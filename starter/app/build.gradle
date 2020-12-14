@@ -31,6 +31,10 @@ android {
         returnDefaultValues = true
     }
 
+    testOptions {
+        animationsDisabled = true
+    }
+
     buildFeatures {
         dataBinding true
         viewBinding true
@@ -141,4 +145,7 @@ dependencies {
 
     // Multidex
     implementation 'com.android.support:multidex:1.0.3'
+
+    // RecyclerView Actions
+    implementation 'it.xabaras.android.espresso:recyclerview-child-actions:1.0'
 }
