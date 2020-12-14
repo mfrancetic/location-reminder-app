@@ -107,12 +107,6 @@ class AppNavigationTest : AutoCloseKoinTest() {
 
     @Test
     fun reminderDescriptionScreen_backButton(): Unit = runBlocking {
-        val reminder1 = ReminderDTO(
-            "title1", "description1", "location1",
-            11.111, 11.112
-        )
-        repository.saveReminder(reminder1)
-
         val activityScenario = ActivityScenario.launch(RemindersActivity::class.java)
         dataBindingIdlingResource.monitorActivity(activityScenario)
 
@@ -134,12 +128,6 @@ class AppNavigationTest : AutoCloseKoinTest() {
 
     @Test
     fun selectReminderScreen_doubleUpButton() = runBlocking {
-        val reminder1 = ReminderDTO(
-            "title1", "description1", "location1",
-            11.111, 11.112
-        )
-        repository.saveReminder(reminder1)
-
         val activityScenario = ActivityScenario.launch(RemindersActivity::class.java)
         dataBindingIdlingResource.monitorActivity(activityScenario)
 

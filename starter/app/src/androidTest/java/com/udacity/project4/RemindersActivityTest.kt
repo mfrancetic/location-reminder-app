@@ -3,11 +3,11 @@ package com.udacity.project4
 import android.app.Application
 import android.content.Context
 import androidx.test.core.app.ActivityScenario
-import androidx.test.core.app.ApplicationProvider
 import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.IdlingRegistry
-import androidx.test.espresso.action.ViewActions.*
+import androidx.test.espresso.action.ViewActions.click
+import androidx.test.espresso.action.ViewActions.replaceText
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -26,7 +26,6 @@ import com.udacity.project4.util.monitorActivity
 import com.udacity.project4.utils.EspressoIdlingResource
 import it.xabaras.android.espresso.recyclerviewchildactions.RecyclerViewChildActions
 import kotlinx.coroutines.runBlocking
-import org.hamcrest.CoreMatchers.*
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -117,12 +116,6 @@ class RemindersActivityTest :
 
     @Test
     fun testAddAReminder_noLocationSelected_snackbarWithErrorMessageAppears(): Unit = runBlocking {
-        val reminder1 = ReminderDTO(
-            "title1", "description1", "location1",
-            11.111, 11.112
-        )
-        repository.saveReminder(reminder1)
-
         val activityScenario = ActivityScenario.launch(RemindersActivity::class.java)
         dataBindingIdlingResource.monitorActivity(activityScenario)
 
@@ -139,12 +132,6 @@ class RemindersActivityTest :
 
     @Test
     fun testAddAReminder_reminderListAppears(): Unit = runBlocking {
-        val reminder1 = ReminderDTO(
-            "title1", "description1", "location1",
-            11.111, 11.112
-        )
-        repository.saveReminder(reminder1)
-
         val activityScenario = ActivityScenario.launch(RemindersActivity::class.java)
         dataBindingIdlingResource.monitorActivity(activityScenario)
 
@@ -174,12 +161,6 @@ class RemindersActivityTest :
 
     @Test
     fun testClickingOnListItem_opensRemindersDescriptionActivity(): Unit = runBlocking {
-        val reminder1 = ReminderDTO(
-            "title1", "description1", "location1",
-            11.111, 11.112
-        )
-        repository.saveReminder(reminder1)
-
         val activityScenario = ActivityScenario.launch(RemindersActivity::class.java)
         dataBindingIdlingResource.monitorActivity(activityScenario)
 
