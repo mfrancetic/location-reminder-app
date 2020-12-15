@@ -79,9 +79,12 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
                 _viewModel.longitude.value = reminderDTO.longitude
                 _viewModel.reminderSelectedLocationStr.value = reminderDTO.location
             }
+            val selectedPOI = _selectLocationViewModel.selectedPoi.value
+            if (selectedPOI != null) {
+                _viewModel.selectedPOI.value = selectedPOI
+            }
         }
     }
-
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.map_options, menu)
@@ -125,7 +128,8 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
                 _selectLocationViewModel.setLocation(
                     fragmentContext.getString(R.string.unknown_location),
                     location.latitude,
-                    location.longitude
+                    location.longitude,
+                    null
                 )
             } else {
                 _viewModel.showErrorMessage.postValue(fragmentContext.getString(R.string.only_one_location_allowed))
@@ -145,7 +149,8 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
                 _selectLocationViewModel.setLocation(
                     poi.name,
                     poi.latLng.latitude,
-                    poi.latLng.longitude
+                    poi.latLng.longitude,
+                    poi
                 )
             } else {
                 _viewModel.showErrorMessage.postValue(fragmentContext.getString(R.string.only_one_location_allowed))
