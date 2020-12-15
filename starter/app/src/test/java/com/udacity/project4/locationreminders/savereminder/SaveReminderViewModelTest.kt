@@ -28,6 +28,7 @@ import org.koin.core.context.stopKoin
 import org.robolectric.annotation.Config
 
 @ExperimentalCoroutinesApi
+@Config(sdk = [Build.VERSION_CODES.O])
 @RunWith(AndroidJUnit4::class)
 class SaveReminderViewModelTest {
 
@@ -58,7 +59,6 @@ class SaveReminderViewModelTest {
         stopKoin()
     }
 
-    @Config(sdk = [Build.VERSION_CODES.O])
     @Test
     fun testOnClear() = mainCoroutineRule.runBlockingTest {
         saveReminderViewModel.onClear()
@@ -89,7 +89,6 @@ class SaveReminderViewModelTest {
         )
     }
 
-    @Config(sdk = [Build.VERSION_CODES.O])
     @Test
     fun testValidateEnteredData_returnsTrue() {
         val title = "title"
@@ -103,7 +102,6 @@ class SaveReminderViewModelTest {
         assertThat(isValid.toString(), CoreMatchers.`is`("true"))
     }
 
-    @Config(sdk = [Build.VERSION_CODES.O])
     @Test
     fun testValidateEnteredData_LocationMissing_returnsFalse() {
         val title = "title"
@@ -120,7 +118,6 @@ class SaveReminderViewModelTest {
         )
     }
 
-    @Config(sdk = [Build.VERSION_CODES.O])
     @Test
     fun testValidateEnteredData_TitleMissing_returnsFalse() {
         val location = "location"
@@ -137,8 +134,6 @@ class SaveReminderViewModelTest {
         )
     }
 
-
-    @Config(sdk = [Build.VERSION_CODES.O])
     @Test
     fun validateAndSaveReminder_invalidDataItem_returnsNul() = mainCoroutineRule.runBlockingTest {
         val location = "location"
@@ -162,7 +157,6 @@ class SaveReminderViewModelTest {
         )
     }
 
-    @Config(sdk = [Build.VERSION_CODES.O])
     @Test
     fun check_loading() = mainCoroutineRule.runBlockingTest {
         val reminderDataItem = ReminderDataItem(
@@ -187,7 +181,6 @@ class SaveReminderViewModelTest {
         assertThat(showNavigationCommand, CoreMatchers.`is`(NavigationCommand.Back))
     }
 
-    @Config(sdk = [Build.VERSION_CODES.O])
     @Test
     fun shouldReturnError() = mainCoroutineRule.runBlockingTest {
         dataSource.setReturnError(true)
