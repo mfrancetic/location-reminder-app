@@ -1,6 +1,5 @@
 package com.udacity.project4.locationreminders.savereminder.selectreminderlocation
 
-
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
@@ -110,7 +109,6 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
 
     override fun onMapReady(googleMap: GoogleMap) {
         map = googleMap
-
         map.setMapStyle(MapStyleOptions.loadRawResourceStyle(context, R.raw.map_style))
 
         enableMyLocation()

@@ -11,23 +11,18 @@ import com.udacity.project4.locationreminders.reminderslist.ReminderDataItem
  */
 sealed class IntentCommand {
     /**
-     * navigate to an activity
+     * navigate to RemindersActivity
      */
     data class ToReminderActivity(val from: AppCompatActivity, val to: Class<RemindersActivity>) :
         IntentCommand()
 
     /**
-     * navigate to an activity
+     * navigate to ReminderDescriptionActivity
      */
     data class ToReminderDescriptionActivity(
         val from: AppCompatActivity, val to: Class<ReminderDescriptionActivity>,
         val item: ReminderDataItem
     ) : IntentCommand()
-
-    /**
-     * navigate back to the previous activity
-     */
-    object Back : IntentCommand()
 
     /**
      * navigate back to a destination in the back stack

@@ -27,9 +27,9 @@ class GeofenceTransitionsJobIntentService : JobIntentService(), CoroutineScope {
 
         fun enqueueWork(context: Context, intent: Intent) {
             enqueueWork(
-                    context,
-                    GeofenceTransitionsJobIntentService::class.java, JOB_ID,
-                    intent
+                context,
+                GeofenceTransitionsJobIntentService::class.java, JOB_ID,
+                intent
             )
         }
     }
@@ -44,7 +44,8 @@ class GeofenceTransitionsJobIntentService : JobIntentService(), CoroutineScope {
 
         val triggeringGeofences: MutableList<Geofence> = mutableListOf()
         if (geofencingEvent.geofenceTransition == Geofence.GEOFENCE_TRANSITION_ENTER ||
-                geofencingEvent.geofenceTransition == Geofence.GEOFENCE_TRANSITION_DWELL) {
+            geofencingEvent.geofenceTransition == Geofence.GEOFENCE_TRANSITION_DWELL
+        ) {
             Log.v(KOIN_TAG, "Geofence entered")
 
             if (geofencingEvent.triggeringGeofences.isNotEmpty()) {
@@ -82,14 +83,14 @@ class GeofenceTransitionsJobIntentService : JobIntentService(), CoroutineScope {
                 val reminderDTO = result.data
                 //send a notification to the user with the reminder details
                 sendNotification(
-                        this@GeofenceTransitionsJobIntentService, ReminderDataItem(
+                    this@GeofenceTransitionsJobIntentService, ReminderDataItem(
                         reminderDTO.title,
                         reminderDTO.description,
                         reminderDTO.location,
                         reminderDTO.latitude,
                         reminderDTO.longitude,
                         reminderDTO.id
-                )
+                    )
                 )
             }
         }
