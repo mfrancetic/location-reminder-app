@@ -146,6 +146,7 @@ class RemindersActivityTest :
         onView(withId(R.id.map)).perform(click())
 
         onView(withId(R.id.save_location_button)).perform(click())
+        onView(withText(appContext.getString(R.string.save))).perform(click())
 
         val toastMessage = appContext.getString(R.string.reminder_saved)
         var remindersActivity: RemindersActivity? = null
