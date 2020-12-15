@@ -33,6 +33,9 @@ class RemindersActivity : AppCompatActivity() {
     }
 
     override fun onBackPressed() {
-        return
+        if (this.findNavController(R.id.nav_host_fragment).currentDestination?.id == R.id.reminderListFragment){
+            return
+        }
+        super.onBackPressed()
     }
 }
