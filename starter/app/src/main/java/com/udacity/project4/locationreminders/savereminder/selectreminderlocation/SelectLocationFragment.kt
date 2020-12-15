@@ -120,10 +120,10 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
                 map.addMarker(
                     MarkerOptions()
                         .position(LatLng(location.latitude, location.longitude))
-                        .title(fragmentContext.getString(R.string.reminder_location))
+                        .title(fragmentContext.getString(R.string.unknown_location))
                 )
                 _selectLocationViewModel.setLocation(
-                    fragmentContext.getString(R.string.reminder_location),
+                    fragmentContext.getString(R.string.unknown_location),
                     location.latitude,
                     location.longitude
                 )
