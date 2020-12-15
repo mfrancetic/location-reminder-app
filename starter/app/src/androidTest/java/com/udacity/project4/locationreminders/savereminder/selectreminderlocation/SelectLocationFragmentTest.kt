@@ -2,7 +2,6 @@ package com.udacity.project4.locationreminders.savereminder.selectreminderlocati
 
 import android.app.Application
 import android.os.Bundle
-import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.fragment.app.testing.launchFragmentInContainer
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
@@ -21,8 +20,6 @@ import com.udacity.project4.locationreminders.data.local.LocalDB
 import com.udacity.project4.locationreminders.data.local.RemindersLocalRepository
 import com.udacity.project4.locationreminders.savereminder.SaveReminderViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.runBlocking
-import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -42,9 +39,6 @@ class SelectLocationFragmentTest : AutoCloseKoinTest() {
 
     @get: Rule
     val mainCoroutineRule = MainAndroidTestCoroutineRule()
-
-    @get:Rule
-    var instantTaskExecutorRule = InstantTaskExecutorRule()
 
     private lateinit var appContext: Application
 
@@ -71,11 +65,6 @@ class SelectLocationFragmentTest : AutoCloseKoinTest() {
         startKoin {
             modules(listOf(myModule))
         }
-    }
-
-    @After
-    fun cleanupDb() = runBlocking {
-        stopKoin()
     }
 
     @Test

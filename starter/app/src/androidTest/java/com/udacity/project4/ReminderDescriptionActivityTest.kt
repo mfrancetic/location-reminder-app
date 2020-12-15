@@ -37,7 +37,6 @@ import org.koin.test.get
 class ReminderDescriptionActivityTest :
     AutoCloseKoinTest() {
 
-
     private lateinit var repository: ReminderDataSource
     private lateinit var appContext: Application
 

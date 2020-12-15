@@ -2,7 +2,6 @@ package com.udacity.project4.locationreminders.reminderslist
 
 import android.app.Application
 import android.os.Bundle
-import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.fragment.app.testing.launchFragmentInContainer
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
@@ -13,7 +12,6 @@ import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
-import com.udacity.project4.MainAndroidTestCoroutineRule
 import com.udacity.project4.R
 import com.udacity.project4.authentication.AuthenticationViewModel
 import com.udacity.project4.locationreminders.data.ReminderDataSource
@@ -23,12 +21,7 @@ import com.udacity.project4.locationreminders.data.local.RemindersLocalRepositor
 import com.udacity.project4.locationreminders.savereminder.SaveReminderViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.test.TestCoroutineDispatcher
-import kotlinx.coroutines.test.TestCoroutineScope
-import kotlinx.coroutines.test.runBlockingTest
-import org.junit.After
 import org.junit.Before
-import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.koin.androidx.viewmodel.dsl.viewModel
@@ -45,12 +38,6 @@ import org.mockito.Mockito.verify
 //UI Testing
 @MediumTest
 class ReminderListFragmentTest : AutoCloseKoinTest() {
-
-    @get: Rule
-    val mainCoroutineRule = MainAndroidTestCoroutineRule()
-
-    @get:Rule
-    var instantTaskExecutorRule = InstantTaskExecutorRule()
 
     private lateinit var repository: ReminderDataSource
     private lateinit var appContext: Application
@@ -104,11 +91,6 @@ class ReminderListFragmentTest : AutoCloseKoinTest() {
         repository.saveReminder(reminder2)
     }
 
-    @After
-    fun cleanupDb() = runBlocking {
-        stopKoin()
-    }
-
     @Test
     fun reminderList_displayedInUI(): Unit = runBlocking {
         launchFragmentInContainer<ReminderListFragment>(Bundle(), R.style.AppTheme)
@@ -119,6 +101,10 @@ class ReminderListFragmentTest : AutoCloseKoinTest() {
         onView(withId(R.id.reminderssRecyclerView))
             .check(matches(hasDescendant(withText("title1"))))
             .check(matches(hasDescendant(withText("title2"))))
+            .check(matches(hasDescendant(withText("description1"))))
+            .check(matches(hasDescendant(withText("description2"))))
+            .check(matches(hasDescendant(withText("location1"))))
+            .check(matches(hasDescendant(withText("location2"))))
     }
 
     @Test

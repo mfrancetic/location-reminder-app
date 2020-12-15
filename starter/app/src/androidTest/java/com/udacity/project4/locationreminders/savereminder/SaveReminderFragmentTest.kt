@@ -2,7 +2,6 @@ package com.udacity.project4.locationreminders.savereminder
 
 import android.app.Application
 import android.os.Bundle
-import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.fragment.app.testing.launchFragmentInContainer
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.espresso.Espresso
@@ -11,16 +10,13 @@ import androidx.test.espresso.assertion.ViewAssertions
 import androidx.test.espresso.matcher.ViewMatchers
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
-import com.udacity.project4.MainAndroidTestCoroutineRule
 import com.udacity.project4.R
 import com.udacity.project4.locationreminders.data.ReminderDataSource
 import com.udacity.project4.locationreminders.data.local.LocalDB
 import com.udacity.project4.locationreminders.data.local.RemindersLocalRepository
 import com.udacity.project4.locationreminders.savereminder.selectreminderlocation.SelectLocationViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import org.junit.After
 import org.junit.Before
-import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.koin.androidx.viewmodel.dsl.viewModel
@@ -34,12 +30,6 @@ import org.koin.test.AutoCloseKoinTest
 //UI Testing
 @MediumTest
 class SaveReminderFragmentTest : AutoCloseKoinTest() {
-
-    @get: Rule
-    val mainCoroutineRule = MainAndroidTestCoroutineRule()
-
-    @get:Rule
-    var instantTaskExecutorRule = InstantTaskExecutorRule()
 
     private lateinit var appContext: Application
 
@@ -66,11 +56,6 @@ class SaveReminderFragmentTest : AutoCloseKoinTest() {
         startKoin {
             modules(listOf(myModule))
         }
-    }
-
-    @After
-    fun cleanupDb() {
-        stopKoin()
     }
 
     @Test

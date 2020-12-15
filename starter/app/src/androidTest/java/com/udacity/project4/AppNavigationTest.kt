@@ -37,7 +37,6 @@ import org.koin.dsl.module
 import org.koin.test.AutoCloseKoinTest
 import org.koin.test.get
 
-
 @RunWith(AndroidJUnit4::class)
 @LargeTest
 class AppNavigationTest : AutoCloseKoinTest() {
