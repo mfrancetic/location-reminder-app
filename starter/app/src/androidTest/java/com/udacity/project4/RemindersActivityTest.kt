@@ -140,15 +140,9 @@ class RemindersActivityTest :
         onView(withId(R.id.selectLocation)).perform(click())
 
         onView(withId(R.id.map)).check(matches(isDisplayed()))
-        onView(withText(appContext.getString(R.string.save))).check(matches(isDisplayed()))
-
         onView(withId(R.id.map)).perform(click())
 
         onView(withId(R.id.save_location_button)).perform(click())
-
-        val context = getApplicationContext() as Context
-
-        onView(withText(context.getString(R.string.save))).perform(click())
 
         onView(withText("title2"))
             .check(matches(isDisplayed()))
