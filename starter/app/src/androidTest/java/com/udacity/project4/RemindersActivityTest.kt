@@ -1,7 +1,6 @@
 package com.udacity.project4
 
 import android.app.Application
-import android.content.Context
 import androidx.test.core.app.ActivityScenario
 import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import androidx.test.espresso.Espresso.onView
@@ -9,6 +8,7 @@ import androidx.test.espresso.IdlingRegistry
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.action.ViewActions.replaceText
 import androidx.test.espresso.assertion.ViewAssertions.matches
+import androidx.test.espresso.matcher.RootMatchers.withDecorView
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
@@ -26,6 +26,8 @@ import com.udacity.project4.util.monitorActivity
 import com.udacity.project4.utils.EspressoIdlingResource
 import it.xabaras.android.espresso.recyclerviewchildactions.RecyclerViewChildActions
 import kotlinx.coroutines.runBlocking
+import org.hamcrest.CoreMatchers.`is`
+import org.hamcrest.CoreMatchers.not
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -36,6 +38,7 @@ import org.koin.core.context.stopKoin
 import org.koin.dsl.module
 import org.koin.test.AutoCloseKoinTest
 import org.koin.test.get
+
 
 @RunWith(AndroidJUnit4::class)
 @LargeTest
@@ -143,6 +146,25 @@ class RemindersActivityTest :
         onView(withId(R.id.map)).perform(click())
 
         onView(withId(R.id.save_location_button)).perform(click())
+
+        val toastMessage = appContext.getString(R.string.reminder_saved)
+        var remindersActivity: RemindersActivity? = null
+        activityScenario.onActivity { activity ->
+            remindersActivity = activity
+        }
+        onView(withText(toastMessage)).inRoot(
+            withDecorView(
+                not(
+                    `is`(
+                        remindersActivity?.getWindow()?.getDecorView()
+                    )
+                )
+            )
+        ).check(
+            matches(
+                isDisplayed()
+            )
+        )
 
         onView(withText("title2"))
             .check(matches(isDisplayed()))
