@@ -1,10 +1,15 @@
 package com.udacity.project4
 
 import android.app.Application
+import android.graphics.Paint
+import android.os.IBinder
+import android.view.WindowManager
+import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.test.core.app.ActivityScenario
 import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.IdlingRegistry
+import androidx.test.espresso.Root
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.action.ViewActions.replaceText
 import androidx.test.espresso.assertion.ViewAssertions.matches
@@ -25,11 +30,17 @@ import com.udacity.project4.util.DataBindingIdlingResource
 import com.udacity.project4.util.monitorActivity
 import com.udacity.project4.utils.EspressoIdlingResource
 import it.xabaras.android.espresso.recyclerviewchildactions.RecyclerViewChildActions
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runBlockingTest
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.CoreMatchers.not
+import org.hamcrest.Description
+import org.hamcrest.Matcher
+import org.hamcrest.TypeSafeMatcher
 import org.junit.After
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.koin.androidx.viewmodel.dsl.viewModel
@@ -39,7 +50,7 @@ import org.koin.dsl.module
 import org.koin.test.AutoCloseKoinTest
 import org.koin.test.get
 
-
+@ExperimentalCoroutinesApi
 @RunWith(AndroidJUnit4::class)
 @LargeTest
 //END TO END test to black box test the app
@@ -48,6 +59,9 @@ class RemindersActivityTest :
 
     private lateinit var repository: ReminderDataSource
     private lateinit var appContext: Application
+
+    @get:Rule
+    var instantTaskExecutorRule = InstantTaskExecutorRule()
 
     /**
      * As we use Koin as a Service Locator Library to develop our code, we'll also use Koin to test our code.
@@ -95,11 +109,6 @@ class RemindersActivityTest :
         runBlocking {
             repository.deleteAllReminders()
         }
-        val reminder1 = ReminderDTO(
-            "title1", "description1", "location1",
-            11.111, 11.112
-        )
-        repository.saveReminder(reminder1)
     }
 
     private val dataBindingIdlingResource = DataBindingIdlingResource()
@@ -133,50 +142,47 @@ class RemindersActivityTest :
     }
 
     @Test
-    fun testAddAReminder_reminderListAppears(): Unit = runBlocking {
+    fun testAddAReminder_reminderListAppears() = runBlocking {
+        val reminder1 = ReminderDTO(
+            "title1", "description1", "location1",
+            11.111, 11.112
+        )
+        repository.saveReminder(reminder1)
+
         val activityScenario = ActivityScenario.launch(RemindersActivity::class.java)
         dataBindingIdlingResource.monitorActivity(activityScenario)
 
         onView(withId(R.id.addReminderFAB)).perform(click())
         onView(withId(R.id.reminderTitle)).perform(replaceText("title2"))
         onView(withId(R.id.reminderDescription)).perform(replaceText("description2"))
+
         onView(withId(R.id.selectLocation)).perform(click())
 
         onView(withId(R.id.map)).check(matches(isDisplayed()))
         onView(withId(R.id.map)).perform(click())
 
         onView(withId(R.id.save_location_button)).perform(click())
-        onView(withText(appContext.getString(R.string.save))).perform(click())
 
-        val toastMessage = appContext.getString(R.string.reminder_saved)
-        var remindersActivity: RemindersActivity? = null
-        activityScenario.onActivity { activity ->
-            remindersActivity = activity
-        }
-        onView(withText(toastMessage)).inRoot(
-            withDecorView(
-                not(
-                    `is`(
-                        remindersActivity?.getWindow()?.getDecorView()
-                    )
-                )
-            )
-        ).check(
-            matches(
-                isDisplayed()
-            )
-        )
+        onView(withId(R.id.saveReminder)).perform(click())
 
-        onView(withText("title2"))
-            .check(matches(isDisplayed()))
-        onView(withText("description2"))
-            .check(matches(isDisplayed()))
+        onView(withText(R.string.reminder_saved)).inRoot(isToast()).check(matches(isDisplayed()));
+
+        onView(withId(R.id.reminderssRecyclerView))
+            .check(matches(hasDescendant(withText("title2"))))
+        onView(withId(R.id.reminderssRecyclerView))
+            .check(matches(hasDescendant(withText("description2"))))
 
         activityScenario.close()
     }
 
     @Test
     fun testClickingOnListItem_opensRemindersDescriptionActivity(): Unit = runBlocking {
+        val reminder1 = ReminderDTO(
+            "title1", "description1", "location1",
+            11.111, 11.112
+        )
+        repository.saveReminder(reminder1)
+
         val activityScenario = ActivityScenario.launch(RemindersActivity::class.java)
         dataBindingIdlingResource.monitorActivity(activityScenario)
 
@@ -205,4 +211,28 @@ class RemindersActivityTest :
 
         activityScenario.close()
     }
+}
+
+class ToastMatcher : TypeSafeMatcher<Root?>() {
+    override fun describeTo(description: Description) {
+        description.appendText("is toast")
+    }
+
+    override fun matchesSafely(root: Root?): Boolean {
+        val type: Int? = root?.windowLayoutParams?.get()?.type
+        if (type == WindowManager.LayoutParams.TYPE_TOAST) {
+            val windowToken: IBinder? = root.decorView?.windowToken
+            val appToken: IBinder? = root.decorView?.applicationWindowToken
+            if (windowToken === appToken) {
+                // windowToken == appToken means this window isn't contained by any other windows.
+                // if it was a window for an activity, it would have TYPE_BASE_APPLICATION.
+                return true
+            }
+        }
+        return false
+    }
+}
+
+fun isToast(): Matcher<Root?> {
+    return ToastMatcher()
 }
