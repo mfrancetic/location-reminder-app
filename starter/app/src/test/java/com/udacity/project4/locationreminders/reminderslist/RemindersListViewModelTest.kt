@@ -2,6 +2,7 @@ package com.udacity.project4.locationreminders.reminderslist
 
 import android.app.Application
 import android.os.Build
+import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.udacity.project4.locationreminders.MainTestCoroutineRule
@@ -28,6 +29,10 @@ class RemindersListViewModelTest {
 
     @get: Rule
     var mainCoroutineRule = MainTestCoroutineRule()
+
+    @get: Rule
+    var instantExecutorRule = InstantTaskExecutorRule()
+
 
     private lateinit var dataSource: FakeDataSource
     private lateinit var remindersListViewModel: RemindersListViewModel
