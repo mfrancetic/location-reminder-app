@@ -137,12 +137,7 @@ class ReminderListFragmentTest : AutoCloseKoinTest() {
     fun noData_displaysNoDataMessage(): Unit = runBlocking {
         repository.deleteAllReminders()
 
-        val scenario =
-            launchFragmentInContainer<ReminderListFragment>(Bundle(), R.style.AppTheme)
-        val navController = mock(NavController::class.java)
-        scenario.onFragment {
-            Navigation.setViewNavController(it.requireView(), navController)
-        }
+        launchFragmentInContainer<ReminderListFragment>(Bundle(), R.style.AppTheme)
 
         onView(withId(R.id.noDataTextView))
             .check(matches(isDisplayed()))
