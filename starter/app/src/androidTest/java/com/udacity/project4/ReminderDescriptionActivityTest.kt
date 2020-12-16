@@ -21,6 +21,7 @@ import com.udacity.project4.locationreminders.savereminder.SaveReminderViewModel
 import com.udacity.project4.locationreminders.savereminder.selectreminderlocation.SelectLocationViewModel
 import it.xabaras.android.espresso.recyclerviewchildactions.RecyclerViewChildActions
 import kotlinx.coroutines.runBlocking
+import org.junit.After
 import org.junit.Before
 
 import org.junit.Test
@@ -87,6 +88,11 @@ class ReminderDescriptionActivityTest :
             11.111, 11.112
         )
         repository.saveReminder(reminder1)
+    }
+
+    @After
+    fun cleanUp(){
+        stopKoin()
     }
 
     @Test
